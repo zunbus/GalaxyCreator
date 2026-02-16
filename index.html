@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Galaxy Creator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="img/favicon.png">
+  </head>
+  <body>
+    <div id="sidebar">
+      <h1>Galaxy Creator</h1>
+
+      <div class="sidebar-section" data-section-id="tools" draggable="true">
+        <div class="section-header">
+          <span class="title">Tools</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <div style="display:flex; gap:5px; align-items:center; font-size:11px; margin-bottom:5px;">
+            <input id="searchStar" type="text" placeholder="Search star..." style="flex:1;" />
+            <button id="searchBtn">Search</button>
+          </div>
+          <div style="font-size:11px;">
+            Scroll on the canvas: zoom, drag: move view.<br>
+            Star positions in grid units (x,y).
+          </div>
+        </div>
+      </div>
+
+
+      <div class="sidebar-section" data-section-id="factions" draggable="true">
+        <div class="section-header">
+          <span class="title">Factions</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <label>Select faction</label>
+          <select id="factionSelect"></select>
+          <label>Add new faction</label>
+          <div class="row">
+            <div>
+              <input id="newFactionName" type="text" placeholder="e.g. Empire" />
+            </div>
+            <div>
+              <input id="newFactionColor" type="color" value="#44aa88" />
+            </div>
+          </div>
+          <button id="addFactionBtn">Add faction</button>
+          <div id="factionList"></div>
+        </div>
+      </div>
+
+
+      <div class="sidebar-section" data-section-id="stars" draggable="true">
+        <div class="section-header">
+          <span class="title">New Star</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <label>Star Name</label>
+          <input id="starName" type="text" placeholder="e.g. Solaris" />
+          <label>Description</label>
+          <textarea id="starDescription" placeholder="Short description of the star"></textarea>
+
+          <div class="row">
+            <div>
+              <label>Faction</label>
+              <select id="starFactionSelect"></select>
+            </div>
+            <div>
+              <label>Temperature [K]</label>
+              <input id="starTemp" type="number" min="1000" max="50000" value="5800" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Star Color</label>
+              <select id="starColorMode">
+                <option value="auto">Automatic from temperature</option>
+                <option value="#ffb07c">Reddish</option>
+                <option value="#ffd29c">Orange</option>
+                <option value="#fff4e5">Yellow</option>
+                <option value="#cfdfff">White</option>
+                <option value="#9bb0ff">Bluish</option>
+              </select>
+            </div>
+            <div>
+              <label>Position X</label>
+              <input id="starX" type="number" value="0" />
+            </div>
+            <div>
+              <label>Position Y</label>
+              <input id="starY" type="number" value="0" />
+            </div>
+          </div>
+
+          <button id="addStarBtn">Add Star</button>
+        </div>
+      </div>
+
+
+      <div class="sidebar-section" data-section-id="planets" draggable="true">
+        <div class="section-header">
+          <span class="title">Planets, Moons, Locations</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <h2 style="margin:4px 0; font-size:13px;">Planets</h2>
+          <label>Star</label>
+          <select id="planetStarSelect"></select>
+          <label>Planet Name</label>
+          <input id="planetName" type="text" placeholder="e.g. Aurelia" />
+          <label>Planet Description</label>
+          <textarea id="planetDescription" placeholder="Type, climate, etc."></textarea>
+          <button id="addPlanetBtn">Add Planet</button>
+
+          <h3 style="margin:8px 0 4px; font-size:13px;">Moons</h3>
+          <label>Planet</label>
+          <select id="moonPlanetSelect"></select>
+          <label>Moon Name</label>
+          <input id="moonName" type="text" placeholder="e.g. Selene" />
+          <button id="addMoonBtn">Add Moon</button>
+
+          <h3 style="margin:8px 0 4px; font-size:13px;">Locations</h3>
+          <label>Planet</label>
+          <select id="locationPlanetSelect"></select>
+          <label>Location Name</label>
+          <input id="locationName" type="text" placeholder="e.g. Colony City" />
+          <label>Location Description</label>
+          <textarea id="locationDescription" placeholder="City, base, region..."></textarea>
+          <button id="addLocationBtn">Add Location</button>
+        </div>
+      </div>
+
+
+      <div class="sidebar-section" data-section-id="structure" draggable="true">
+        <div class="section-header">
+          <span class="title">Galaxy Structure</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <div id="structureWrapper">
+            <div id="structureView"></div>
+            <div id="structureResizer" title="Drag to resize height"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="sidebar-section" data-section-id="delete" draggable="true">
+        <div class="section-header">
+          <span class="title">Delete Star</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <label>Select star to delete</label>
+          <select id="deleteStarSelect"></select>
+          <button id="deleteStarBtn" style="background:#c0392b;">Delete Star</button>
+        </div>
+      </div>
+
+
+      <div class="sidebar-section" data-section-id="io" draggable="true">
+        <div class="section-header">
+          <span class="title">Import / Export</span>
+          <button class="toggle" type="button">➖</button>
+        </div>
+        <div class="section-body">
+          <button id="saveJsonBtn">Save as JSON</button>
+          <div class="file-input-wrapper">
+              <input type="file" id="loadJsonInp" accept="application/json">
+              <label for="loadJsonInp" class="file-input-button">
+                  Choose file…
+              </label>
+              <span id="fileName">No file selected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="canvas-container">
+        <canvas id="galaxyCanvas"></canvas>
+      </div>
+      <div id="info-panel">
+        <div id="zoomInfo"></div>
+        <div id="infoContent" style="margin-top:4px;">Click a star to see details.</div>
+      </div>
+    </div>
+
+    <script src="scripts/core.js"></script>
+    <script src="scripts/rendering.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/factions.js"></script>
+    <script src="scripts/interactions.js"></script>
+    <script src="scripts/saving.js"></script>
+    <script src="scripts/modularity.js"></script>
+  </body>
+</html>

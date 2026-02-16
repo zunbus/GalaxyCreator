@@ -1,0 +1,254 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    background: #000;
+    color: #eee;
+}
+
+#sidebar {
+    width: 380px;
+    background: #111;
+    border-right: 1px solid #333;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    font-size: 20px;
+    margin: 5px 0 10px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 16px;
+    margin: 0;
+}
+
+label {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+input, select, textarea {
+    width: 100%;
+    margin-top: 2px;
+    padding: 4px;
+    border-radius: 3px;
+    border: 1px solid #444;
+    background: #1b1b1b;
+    color: #eee;
+    font-size: 12px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 40px;
+}
+
+button {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    border: none;
+    background: #2d7dd2;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+button:hover {
+    background: #3b8ef0;
+}
+
+.row {
+    display: flex;
+    gap: 5px;
+}
+
+.row > div {
+    flex: 1;
+}
+
+#canvas-container {
+    flex: 1;
+    position: relative;
+}
+
+#galaxyCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: radial-gradient(circle at center, #000 0%, #02040a 60%, #000 100%);
+    cursor: grab;
+}
+
+#galaxyCanvas.dragging {
+    cursor: grabbing;
+}
+
+#info-panel {
+    height: 200px;
+    background: rgba(0,0,0,0.9);
+    border-top: 1px solid #333;
+    padding: 8px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+.star-item, .planet-item {
+    margin-left: 8px;
+    padding-left: 6px;
+    border-left: 1px dotted #555;
+}
+
+.list-title {
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+#zoomInfo {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.faction-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.faction-row span {
+    flex: 1;
+}
+
+.faction-row input[type="color"] {
+    width: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.sidebar-section {
+    border: 1px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #151515;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    padding: 4px 6px;
+    background: #1f1f1f;
+    cursor: move;
+    user-select: none;
+    font-size: 13px;
+    border-bottom: 1px solid #333;
+}
+
+.section-header span.title {
+    flex: 1;
+}
+
+.section-header button.toggle {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #eee;
+    font-size: 14px;
+    padding: 0 4px;
+}
+
+.section-body {
+    padding: 6px;
+}
+
+.sidebar-section.collapsed .section-body {
+    display: none;
+}
+
+.sidebar-section.drag-over {
+    outline: 2px dashed #2d7dd2;
+}
+
+
+#structureWrapper {
+    position: relative;
+    min-height: 80px;
+    max-height: 400px;
+    height: 180px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#structureView {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+#structureResizer {
+    height: 6px;
+    cursor: ns-resize;
+    background: #333;
+    margin-top: 4px;
+    border-radius: 3px;
+}
+
+
+#loadJsonInp {
+    display: none;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.file-input-button {
+    padding: 6px 10px;
+    border-radius: 3px;
+    background: #111;
+    border: 1px solid #444;
+    color: #eee;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s, border 0.15s;
+}
+
+.file-input-button:hover {
+    background: #1b1b1b;
+    border-color: #2d7dd2;
+}
+
+#fileName {
+    flex: 1;
+    font-size: 11px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
