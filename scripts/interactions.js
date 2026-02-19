@@ -4,20 +4,20 @@ canvas.addEventListener('click', (e) => {
     const y = e.clientY - rect.top;
     const worldPos = screenToWorld(x, y);
 
-    let clickedStar = null;
-    for (const star of galaxy.stars) {
-        const dx = worldPos.x - star.x;
-        const dy = worldPos.y - star.y;
+    let clickedBody = null;
+    for (const body of galaxy.celestialBodies) {
+        const dx = worldPos.x - body.x;
+        const dy = worldPos.y - body.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist <= star.radius * 1.5) {
-            clickedStar = star;
+        if (dist <= body.radius * 1.5) {
+            clickedBody = body;
             break;
         }
     }
 
-    if (clickedStar) {
-        renderGalaxy(clickedStar.id);
-        showStarInfo(clickedStar);
+    if (clickedBody) {
+        renderGalaxy(clickedBody.id);
+        showBodyInfo(clickedBody);
     }
 });
 
@@ -66,35 +66,35 @@ canvas.addEventListener('wheel', (e) => {
     renderGalaxy();
 }, { passive: false });
 
-
-document.getElementById('addStarBtn').addEventListener('click', () => {
-    const name = document.getElementById('starName').value.trim();
-    const desc = document.getElementById('starDescription').value.trim();
-    const faction = document.getElementById('starFactionSelect').value;
-    const temp = parseInt(document.getElementById('starTemp').value, 10) || 5800;
-    const wx = parseFloat(document.getElementById('starX').value) || 0;
-    const wy = parseFloat(document.getElementById('starY').value)*-1 || 0;
-    const colorMode = document.getElementById('starColorMode').value;
+document.getElementById('addBodyBtn').addEventListener('click', () => {
+    const name = document.getElementById('bodyName').value.trim();
+    const desc = document.getElementById('bodyDescription').value.trim();
+    const faction = document.getElementById('bodyFactionSelect').value;
+    const temp = parseInt(document.getElementById('bodyTemp').value, 10) || 5800;
+    const wx = parseFloat(document.getElementById('bodyX').value) || 0;
+    const wy = parseFloat(document.getElementById('bodyY').value)*-1 || 0;
+    const colorMode = document.getElementById('bodyColorMode').value;
+    const type = document.getElementById('bodyTypeSelect').value;
 
     if (!name) {
-        alert('Name the star.');
+        alert('Name the celestial body.');
         return;
     }
 
-    const star = addStar(name, desc, faction, temp, wx, wy, colorMode);
-    showStarInfo(star);
+    const body = addCelestialBody(name, desc, faction, temp, wx, wy, colorMode, type);
+    showBodyInfo(body);
 
-    document.getElementById('starName').value = '';
-    document.getElementById('starDescription').value = '';
+    document.getElementById('bodyName').value = '';
+    document.getElementById('bodyDescription').value = '';
 });
 
 document.getElementById('addPlanetBtn').addEventListener('click', () => {
-    const starId = document.getElementById('planetStarSelect').value;
+    const bodyId = document.getElementById('planetBodySelect').value;
     const name = document.getElementById('planetName').value.trim();
     const desc = document.getElementById('planetDescription').value.trim();
 
-    if (!starId) {
-        alert('Add a star first.');
+    if (!bodyId) {
+        alert('Select a celestial body first.');
         return;
     }
     if (!name) {
@@ -102,12 +102,12 @@ document.getElementById('addPlanetBtn').addEventListener('click', () => {
         return;
     }
 
-    addPlanet(starId, name, desc);
+    addPlanet(bodyId, name, desc);
     document.getElementById('planetName').value = '';
     document.getElementById('planetDescription').value = '';
 
-    const star = galaxy.stars.find(s => s.id === starId);
-    if (star) showStarInfo(star);
+    const body = galaxy.celestialBodies.find(b => b.id === bodyId);
+    if (body) showBodyInfo(body);
 });
 
 document.getElementById('addMoonBtn').addEventListener('click', () => {
@@ -127,11 +127,13 @@ document.getElementById('addMoonBtn').addEventListener('click', () => {
     document.getElementById('moonName').value = '';
 
     outer:
-    for (const star of galaxy.stars) {
-        for (const planet of star.planets) {
-            if (planet.id === planetId) {
-                showStarInfo(star);
-                break outer;
+    for (const body of galaxy.celestialBodies) {
+        if (body.planets) {
+            for (const planet of body.planets) {
+                if (planet.id === planetId) {
+                    showBodyInfo(body);
+                    break outer;
+                }
             }
         }
     }
@@ -156,31 +158,33 @@ document.getElementById('addLocationBtn').addEventListener('click', () => {
     document.getElementById('locationDescription').value = '';
 
     outer:
-    for (const star of galaxy.stars) {
-        for (const planet of star.planets) {
-            if (planet.id === planetId) {
-                showStarInfo(star);
-                break outer;
+    for (const body of galaxy.celestialBodies) {
+        if (body.planets) {
+            for (const planet of body.planets) {
+                if (planet.id === planetId) {
+                    showBodyInfo(body);
+                    break outer;
+                }
             }
         }
     }
 });
 
-document.getElementById('deleteStarBtn').addEventListener('click', () => {
-    const select = document.getElementById('deleteStarSelect');
-    const starId = select.value;
-    if (!starId) {
-        alert('No star to delete.');
+document.getElementById('deleteBodyBtn').addEventListener('click', () => {
+    const select = document.getElementById('deleteBodySelect');
+    const bodyId = select.value;
+    if (!bodyId) {
+        alert('No body to delete.');
         return;
     }
-    const star = galaxy.stars.find(s => s.id === starId);
-    const name = star ? star.name : '(bez nazwy)';
+    const body = galaxy.celestialBodies.find(b => b.id === bodyId);
+    const name = body ? body.name : '(unnamed)';
     const confirmed = confirm(`Are you sure to delete "${name}" and all its planets?`);
     if (!confirmed) return;
 
-    deleteStarById(starId);
+    deleteBodyById(bodyId);
     document.getElementById('infoContent').textContent =
-        'The star has been deleted.';
+        'The celestial body has been deleted.';
 });
 
 document.getElementById('addFactionBtn').addEventListener('click', () => {
@@ -198,17 +202,17 @@ document.getElementById('searchBtn').addEventListener('click', () => {
     const q = document.getElementById('searchStar').value.trim().toLowerCase();
     if (!q) return;
 
-    const found = galaxy.stars.filter(s => (s.name || '').toLowerCase().includes(q));
+    const found = galaxy.celestialBodies.filter(b => (b.name || '').toLowerCase().includes(q));
     if (!found.length) {
-        alert('Star not found.');
+        alert('Celestial body not found.');
         return;
     }
 
-    const star = found[0];
-    offsetX = star.x;
-    offsetY = star.y;
-    renderGalaxy(star.id);
-    showStarInfo(star);
+    const body = found[0];
+    offsetX = body.x;
+    offsetY = body.y;
+    renderGalaxy(body.id);
+    showBodyInfo(body);
 });
 
 document.getElementById('searchStar').addEventListener('keydown', (e) => {

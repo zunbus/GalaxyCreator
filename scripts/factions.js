@@ -1,15 +1,15 @@
 function refreshFactionUI() {
     const factionSelect = document.getElementById('factionSelect');
     const factionList = document.getElementById('factionList');
-    const starFactionSelect = document.getElementById('starFactionSelect');
+    const bodyFactionSelect = document.getElementById('bodyFactionSelect');
 
     factionSelect.innerHTML = '';
-    starFactionSelect.innerHTML = '';
+    bodyFactionSelect.innerHTML = '';
 
-    const emptyOptStar = document.createElement('option');
-    emptyOptStar.value = '';
-    emptyOptStar.textContent = 'None';
-    starFactionSelect.appendChild(emptyOptStar);
+    const emptyOptBody = document.createElement('option');
+    emptyOptBody.value = '';
+    emptyOptBody.textContent = 'None';
+    bodyFactionSelect.appendChild(emptyOptBody);
 
     factionList.innerHTML = '';
 
@@ -22,7 +22,7 @@ function refreshFactionUI() {
         const opt2 = document.createElement('option');
         opt2.value = f.name;
         opt2.textContent = f.name;
-        starFactionSelect.appendChild(opt2);
+        bodyFactionSelect.appendChild(opt2);
 
         const row = document.createElement('div');
         row.className = 'faction-row';

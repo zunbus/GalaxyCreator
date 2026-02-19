@@ -13,14 +13,14 @@ document.getElementById('saveJsonBtn').addEventListener('click', () => {
     }, 0);
 });
 
-document.getElementById('loadJsonInput').addEventListener('change', (event) => {
+document.getElementById('loadJsonInp').addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
         try {
             const obj = JSON.parse(ev.target.result);
-            if (!obj || !Array.isArray(obj.stars)) {
+            if (!obj || !Array.isArray(obj.celestialBodies)) {
                 alert('Invalid file format.');
                 return;
             }
@@ -31,8 +31,9 @@ document.getElementById('loadJsonInput').addEventListener('change', (event) => {
             refreshFactionUI();
             renderStructure();
             renderGalaxy();
+            refreshSelectors();
         } catch (err) {
-            alert('Error has occured.');
+            alert('Error has occurred.');
             console.error(err);
         }
     };

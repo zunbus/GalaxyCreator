@@ -28,7 +28,11 @@ function screenToWorld(sx, sy) {
     };
 }
 
-function tempToColor(temp) {
+function tempToColor(temp, type) {
+    if (type === 'blackhole') return '#000000';
+    if (type === 'neutronstar') return '#444444';
+    if (type === 'station') return '#888888';
+    
     const t = Math.max(1000, Math.min(50000, temp || 5800));
     if (t < 3500) return '#ffb07c';
     if (t < 5500) return '#ffd29c';
@@ -113,23 +117,23 @@ function drawAllegianceLinks() {
     ctx.globalAlpha = 0.7;
 
     const groups = {};
-    for (const star of galaxy.stars) {
-        const faction = (star.faction || '').trim();
+    for (const body of galaxy.celestialBodies) {
+        const faction = (body.faction || '').trim();
         if (!faction) continue;
         if (!groups[faction]) groups[faction] = [];
-        groups[faction].push(star);
+        groups[faction].push(body);
     }
 
     for (const faction in groups) {
-        const stars = groups[faction];
-        if (stars.length < 2) continue;
+        const bodies = groups[faction];
+        if (bodies.length < 2) continue;
 
         ctx.strokeStyle = getFactionColor(faction);
 
-        for (let i = 0; i < stars.length; i++) {
-            for (let j = i + 1; j < stars.length; j++) {
-                const a = stars[i];
-                const b = stars[j];
+        for (let i = 0; i < bodies.length; i++) {
+            for (let j = i + 1; j < bodies.length; j++) {
+                const a = bodies[i];
+                const b = bodies[j];
                 const sa = worldToScreen(a.x, a.y);
                 const sb = worldToScreen(b.x, b.y);
 
@@ -144,26 +148,79 @@ function drawAllegianceLinks() {
     ctx.restore();
 }
 
-function renderGalaxy(highlightStarId = null) {
+function renderGalaxy(highlightBodyId = null) {
     drawGrid();
     drawAllegianceLinks();
 
-    for (const star of galaxy.stars) {
-        const pos = worldToScreen(star.x, star.y);
-        const radiusPx = star.radius * scale * (highlightStarId === star.id ? 1.5 : 1);
+    for (const body of galaxy.celestialBodies) {
+        const pos = worldToScreen(body.x, body.y);
+        const radiusPx = body.radius * scale * (highlightBodyId === body.id ? 1.5 : 1);
 
-        ctx.beginPath();
-        ctx.fillStyle = star.color;
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = star.color;
-        ctx.arc(pos.x, pos.y, radiusPx, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        // Special rendering for different body types
+        ctx.save();
+        if (body.type === 'blackhole') {
+            // Event horizon + accretion disk
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#444';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radiusPx * 1.8, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(68, 68, 68, 0.6)';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radiusPx, 0, Math.PI * 2);
+            ctx.fillStyle = body.color;
+            ctx.fill();
+        } else if (body.type === 'neutronstar') {
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = body.color;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radiusPx, 0, Math.PI * 2);
+            ctx.fillStyle = body.color;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        } else if (body.type === 'binary') {
+            // Two orbiting stars
+            const offset = 0.08 * scale;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = body.color;
+            ctx.beginPath();
+            ctx.arc(pos.x - offset, pos.y, radiusPx * 0.7, 0, Math.PI * 2);
+            ctx.fillStyle = body.color;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(pos.x + offset, pos.y, radiusPx * 0.7, 0, Math.PI * 2);
+            ctx.fillStyle = body.color;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        } else if (body.type === 'station') {
+            // Station shape
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radiusPx, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = body.color;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radiusPx * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            // Regular star
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = body.color;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radiusPx, 0, Math.PI * 2);
+            ctx.fillStyle = body.color;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+        ctx.restore();
 
         ctx.fillStyle = '#ddd';
         ctx.font = '10px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(star.name || 'Unnamed', pos.x, pos.y - radiusPx - 4);
+        ctx.fillText(body.name || 'Unnamed', pos.x, pos.y - radiusPx - 4);
     }
 
     updateZoomInfo();

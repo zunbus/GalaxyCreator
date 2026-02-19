@@ -2,7 +2,7 @@ let galaxy = {
     factions: [
         { name: 'Unexplored', color: '#0000' }
     ],
-    stars: []
+    celestialBodies: []
 };
 
 const canvas = document.getElementById('galaxyCanvas');
@@ -24,15 +24,15 @@ function addFaction(name, color) {
     refreshFactionUI();
 }
 
-function addStar(name, description, faction, temperature, wx, wy, colorMode) {
+function addCelestialBody(name, description, faction, temperature, wx, wy, colorMode, type) {
     let color;
     if (colorMode === 'auto') {
-        color = tempToColor(temperature);
+        color = tempToColor(temperature, type);
     } else {
         color = colorMode;
     }
 
-    const star = {
+    const body = {
         id: crypto.randomUUID(),
         name,
         description,
@@ -41,28 +41,29 @@ function addStar(name, description, faction, temperature, wx, wy, colorMode) {
         color,
         x: wx,
         y: wy,
-        radius: 0.2,
-        planets: []
+        radius: type === 'blackhole' ? 0.25 : type === 'neutronstar' ? 0.15 : type === 'station' ? 0.12 : 0.2,
+        type,
+        planets: type !== 'station' ? [] : undefined
     };
-    galaxy.stars.push(star);
+    galaxy.celestialBodies.push(body);
     refreshSelectors();
     renderGalaxy();
     renderStructure();
-    return star;
+    return body;
 }
 
-function deleteStarById(starId) {
-    const idx = galaxy.stars.findIndex(s => s.id === starId);
+function deleteBodyById(bodyId) {
+    const idx = galaxy.celestialBodies.findIndex(b => b.id === bodyId);
     if (idx === -1) return;
-    galaxy.stars.splice(idx, 1);
+    galaxy.celestialBodies.splice(idx, 1);
     refreshSelectors();
     renderStructure();
     renderGalaxy();
 }
 
-function addPlanet(starId, name, description) {
-    const star = galaxy.stars.find(s => s.id === starId);
-    if (!star) return;
+function addPlanet(bodyId, name, description) {
+    const body = galaxy.celestialBodies.find(b => b.id === bodyId && b.type !== 'station');
+    if (!body) return;
     const planet = {
         id: crypto.randomUUID(),
         name,
@@ -70,32 +71,36 @@ function addPlanet(starId, name, description) {
         moons: [],
         locations: []
     };
-    star.planets.push(planet);
+    body.planets.push(planet);
     refreshSelectors();
     renderStructure();
     return planet;
 }
 
 function addMoon(planetId, name) {
-    for (const star of galaxy.stars) {
-        const planet = star.planets.find(p => p.id === planetId);
-        if (planet) {
-            const moon = { id: crypto.randomUUID(), name };
-            planet.moons.push(moon);
-            renderStructure();
-            return moon;
+    for (const body of galaxy.celestialBodies) {
+        if (body.planets) {
+            const planet = body.planets.find(p => p.id === planetId);
+            if (planet) {
+                const moon = { id: crypto.randomUUID(), name };
+                planet.moons.push(moon);
+                renderStructure();
+                return moon;
+            }
         }
     }
 }
 
 function addLocation(planetId, name, description) {
-    for (const star of galaxy.stars) {
-        const planet = star.planets.find(p => p.id === planetId);
-        if (planet) {
-            const loc = { id: crypto.randomUUID(), name, description };
-            planet.locations.push(loc);
-            renderStructure();
-            return loc;
+    for (const body of galaxy.celestialBodies) {
+        if (body.planets) {
+            const planet = body.planets.find(p => p.id === planetId);
+            if (planet) {
+                const loc = { id: crypto.randomUUID(), name, description };
+                planet.locations.push(loc);
+                renderStructure();
+                return loc;
+            }
         }
     }
 }
